@@ -37,12 +37,12 @@ Use simple language and keep the content clear and informative.`
     });
       console.log(response.output_text);
   res.status(200).json(response.output_text)
-  } catch (error) {
-    console.error("AI ERROR:", error);
+  } catch (err) {
+    console.error("AI ERROR:", err);
 
-    res.status(error.status || 500).json({
+    res.status(err.status || 500).json({
       error: "AI request failed",
-      message: error.message
+      message: err.message
     });
   }
 };
