@@ -18,7 +18,7 @@ const openai = new OpenAI({
 // finish 
 exports.generateArticle = async (req, res) => {
   console.log("Inside generateArticle ");
-  
+
   const client = new OpenAI();
   try {
     const { prompt, length = 500 } = req.body;
@@ -35,8 +35,8 @@ Use simple language and keep the content clear and informative.`
 
 
     });
-      console.log(response.output_text);
-  res.status(200).json(response.output_text)
+    console.log(response.output_text);
+    res.status(200).json(response.output_text)
   } catch (err) {
     console.error("AI ERROR:", err);
 
@@ -49,7 +49,7 @@ Use simple language and keep the content clear and informative.`
 
 exports.generateBlogTitle = async (req, res) => {
   console.log("Inside generateBlogTitle ");
-  
+
   const client = new OpenAI();
   try {
     const { prompt, category = 500 } = req.body;
@@ -65,8 +65,8 @@ for the category "${category}". Titles should be easy to understand and relevant
 
 
     });
-      console.log(response.output_text);
-  res.status(200).json(response.output_text)
+    console.log(response.output_text);
+    res.status(200).json(response.output_text)
   } catch (error) {
     console.error("AI ERROR:", error);
 
@@ -80,14 +80,17 @@ for the category "${category}". Titles should be easy to understand and relevant
 exports.generateImage = async (req, res) => {
   console.log("inside generate image controller");
 
-  const { prompt } = req.body
+  const { prompt, style } = req.body
   if (!prompt) {
     res.status(401).json("please sent me prompt")
   }
   else {
     try {
+      const styleText = style || "";
+
+      const finalPrompt = `${prompt}, ${styleText}`;
       const formData = new FormData()
-      formData.append('prompt', prompt)
+      formData.append('prompt', finalPrompt)
 
       const { data } = await axios.post('https://clipdrop-api.co/text-to-image/v1', formData, {
         headers: { 'x-api-key': process.env.CLIPDROP_API_KEY },
