@@ -4,6 +4,7 @@ const route = express.Router()
 const aiController = require('../controller/aiController')
 const { upload } = require('../middleware/multer')
 const { jwtMiddleware } = require('../middleware/jwtMiddleware')
+const payemnetController = require('../controller/paymentController')
 //------------------- user routes ------------------
 
 route.post('/regsiter',userController.registerController)
@@ -21,6 +22,10 @@ route.post('/ai/remove-object',upload.single('image'),aiController.removeBackgro
 
 
 route.get('/ai/text',aiController.testingAi)
+
+// payment
+route.post("/create-checkout-session",jwtMiddleware,payemnetController.createCheckoutSession);
+
 
 module.exports = route
 

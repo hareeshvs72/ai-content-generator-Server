@@ -3,6 +3,7 @@ const OpenAI = require('openai')
 const axios = require('axios')
 const cloudinary = require('../cloudinary/cloudinary')
 const FormData = require("form-data");
+const articles = require("../Model/articleModel");
 
 
 
@@ -21,6 +22,9 @@ exports.generateArticle = async (req, res) => {
 
   const client = new OpenAI();
   try {
+    const email= req.payload
+    console.log(req.payload);
+    
     const { prompt, length = 500 } = req.body;
 
     if (!prompt || typeof prompt !== "string") {
@@ -36,10 +40,21 @@ Use simple language and keep the content clear and informative.`
 
     });
     console.log(response.output_text);
-    res.status(200).json(response.output_text)
+    if(response.output_text){
+   
+    
+    }
+    // res.status(200).json(response.output_text)
+     const  newArticle =  new articles({
+      userId:email,prompt,output:response.output_text
+      
+    })
+        await newArticle.save()
+
+    res.status(200).json(newArticle)
   } catch (err) {
     console.error("AI ERROR:", err);
-
+        
     res.status(err.status || 500).json({
       error: "AI request failed",
       message: err.message
