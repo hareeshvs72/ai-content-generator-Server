@@ -3,7 +3,7 @@ const OpenAI = require('openai')
 const axios = require('axios')
 const cloudinary = require('../cloudinary/cloudinary')
 const FormData = require("form-data");
-const articles = require("../Model/articleModel");
+const aiDatas = require("../Model/aiSchema");
 
 
 
@@ -45,8 +45,8 @@ Use simple language and keep the content clear and informative.`
     
     }
     // res.status(200).json(response.output_text)
-     const  newArticle =  new articles({
-      userId:email,prompt,output:response.output_text
+     const  newArticle =  new aiDatas({
+      userId:email,prompt,output:response.output_text,ai:"article"
       
     })
         await newArticle.save()
@@ -64,7 +64,7 @@ Use simple language and keep the content clear and informative.`
 
 exports.generateBlogTitle = async (req, res) => {
   console.log("Inside generateBlogTitle ");
-
+  const email = req.payload
   const client = new OpenAI();
   try {
     const { prompt, category = 500 } = req.body;
@@ -81,7 +81,12 @@ for the category "${category}". Titles should be easy to understand and relevant
 
     });
     console.log(response.output_text);
-    res.status(200).json(response.output_text)
+     const  newBlogTitle =  new aiDatas({
+      userId:email,prompt,category,output:response.output_text,ai:"blogTitle"
+      
+    })
+        await newBlogTitle.save()
+    res.status(200).json(newBlogTitle)
   } catch (error) {
     console.error("AI ERROR:", error);
 
@@ -94,7 +99,7 @@ for the category "${category}". Titles should be easy to understand and relevant
 
 exports.generateImage = async (req, res) => {
   console.log("inside generate image controller");
-
+ const email = req.payload
   const { prompt, style } = req.body
   if (!prompt) {
     res.status(401).json("please sent me prompt")
@@ -118,7 +123,13 @@ exports.generateImage = async (req, res) => {
       // console.log(upload);
 
       // console.log(data);
-      res.status(200).json(upload.secure_url)
+      const  newImage =  new aiDatas({
+      userId:email,prompt,category:style,output:upload.secure_url,ai:"imagegenerator"
+      
+    })
+        await newImage.save()
+    res.status(200).json(newImage)
+      res.status(200).json(newImage)
 
 
     } catch (error) {
@@ -131,7 +142,7 @@ exports.generateImage = async (req, res) => {
 
 exports.removeImageBackground = async (req, res) => {
   console.log("inside removeImageBackground");
-
+  const email =  req.payload
   console.log(req.file);
   const image = req.file
   if (!req.file) {
@@ -148,9 +159,13 @@ exports.removeImageBackground = async (req, res) => {
         ]
       })
       console.log(upload);
-
+      const  newBgRemove =  new aiDatas({
+      userId:email,prompt:"removebg",category:"removebg",output:upload.secure_url,ai:"bgRemove"
+      
+    })
+        await newBgRemove.save()
       // console.log(data);
-      res.status(200).json(upload.secure_url)
+      res.status(200).json(newBgRemove)
 
 
     } catch (error) {
@@ -245,40 +260,22 @@ exports.testingAi = async (req, res) => {
   res.status(200).json(response.output_text)
 }
 
-// exports.testingAi = async (req, res) => {
-//   console.log("inside testing api");
+// ------------------------  get delet api call ----------
 
-//   try {
-//     const client = new OpenAI({
-//       apiKey: process.env.OPENAI_API_KEY
-//     });
 
-//     const response = await client.responses.create({
-//       model: "gpt-5-nano",
-//       input: [
-//         {
-//           role: "user",
-//           content: [
-//             {
-//               type: "input_text",
-//               text: "Explain how Artificial Intelligence works in simple terms"
-//             }
-//           ]
-//         }
-//       ],
-//       max_output_tokens: 300
-//     });
+exports.getUserAIDataController  = async (req,res)=>{
+  const email =  req.payload 
+  try {
+     const aiData = await aiDatas.find({userId:email})
+   if(!email){
+    res.status(409).json("no Data Avilable")
+   }
+   else{
+    res.status(200).json(aiData)
+   }
+  } catch (error) {
+    res.status(500).json(error)
+  }
+ 
 
-//     // Safe extraction
-//     const text =
-//       response.output?.[0]?.content?.[0]?.text || "No response";
-
-//     console.log(text);
-//     res.status(200).json(text);
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
+}

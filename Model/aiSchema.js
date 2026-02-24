@@ -1,6 +1,6 @@
 const mongoose =  require('mongoose')
 
-const ArticleSchema = new mongoose.Schema({
+const aiSchema = new mongoose.Schema({
     userId:{
         type:String,
         required:true
@@ -9,15 +9,25 @@ const ArticleSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    category:{
+        type:String,
+        
+    },
    output:{
         type:String,
+        required:true
       
     },
         createdAt:{
         type:Date,
        default: Date.now
+    },
+    ai:{
+        type:String,
+        required:true
     }
+
 })
 
-const articles = mongoose.model("articles",ArticleSchema)
-module.exports  = articles
+const aiDatas = mongoose.model("aiDatas",aiSchema)
+module.exports  = aiDatas

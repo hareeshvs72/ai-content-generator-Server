@@ -17,11 +17,12 @@ const userSchema =  new mongoose.Schema({
         type:String,
         default:""
     },
-    plan:{
-      type:String,
-      default: "trail",
-
-    }
+   
+  plan: {
+    type: String,
+    enum: ["free", "pro", "enterprise"],
+    default: "free"
+  },
 })
 
 const users = mongoose.model("users",userSchema)
