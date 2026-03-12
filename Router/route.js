@@ -26,8 +26,8 @@ route.get('/ai/text',aiController.testingAi)
 
 // payment
 
-route.post("/create", subscriptionController.createSubscription);
-route.post("/",express.raw({ type: "application/json" }),webhookController.handleWebhook
+route.post("/api/subscription/create", subscriptionController.createSubscription);
+route.post("/api/subscription/webhook",express.raw({ type: "application/json" }),webhookController.handleWebhook
 );
 module.exports = route
 

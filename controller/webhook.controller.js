@@ -1,8 +1,11 @@
 const stripe = require("../Stripe/Stripe");
 const User = require("../Model/userModel");
-
+require("dotenv").config()
 exports.handleWebhook = async (req, res) => {
+  console.log("inside webhook");
+  
   const sig = req.headers["stripe-signature"];
+// console.log(sig);
 
   let event;
 
@@ -13,13 +16,18 @@ exports.handleWebhook = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
+    console.log(err);
     return res.status(400).send(`Webhook Error: ${err.message}`);
+    
+    
   }
-
+ console.log(event.type);
+ 
   if (event.type === "checkout.session.completed") {
-
+  
     const session = event.data.object;
-
+console.log("Session:", session);
+console.log("Metadata:", session.metadata);
     const userId = session.metadata.userId;
     const plan = session.metadata.plan;
 
@@ -28,7 +36,7 @@ exports.handleWebhook = async (req, res) => {
       stripeCustomerId: session.customer,
       subscriptionId: session.subscription
     });
-
+     
     console.log("User upgraded to:", plan);
   }
 
