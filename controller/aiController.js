@@ -262,20 +262,62 @@ exports.testingAi = async (req, res) => {
 
 // ------------------------  get delet api call ----------
 
-
-exports.getUserAIDataController  = async (req,res)=>{
-  const email =  req.payload 
+exports.getUserAIDataController = async (req, res) => {
+  console.log("inside getUserAiDataController");
+  
   try {
-     const aiData = await aiDatas.find({userId:email})
-   if(!email){
-    res.status(409).json("no Data Avilable")
-   }
-   else{
-    res.status(200).json(aiData)
-   }
-  } catch (error) {
-    res.status(500).json(error)
-  }
- 
+    const email = req.payload;
 
-}
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    // 🔥 pagination params
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+
+    const skip = (page - 1) * limit;
+
+    // ✅ get paginated data
+    const aiData = await aiDatas
+      .find({ userId: email })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // ✅ total count (important)
+    const total = await aiDatas.countDocuments({ userId: email });
+
+    // ✅ counts (for dashboard cards 🔥)
+    const articlecount = await aiDatas.countDocuments({ userId: email,ai: "article" });
+    const blogTitlecount = await aiDatas.countDocuments({ userId: email,ai: "blogTitle" });
+    const imagegeneratedCount = await aiDatas.countDocuments({ userId: email,ai:"imagegenerator" });
+    const bgremoveCount = await aiDatas.countDocuments({ userId: email, ai:"bgRemove"});
+ console.log(imagegeneratedCount);
+ 
+    res.status(200).json({
+      success: true,
+      data: aiData,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+
+      // 🔥 send counts separately (BEST PRACTICE)
+      counts: {
+        articlecount,
+        blogTitlecount,
+        imagegeneratedCount,
+        bgremoveCount,
+      },
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
