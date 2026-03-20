@@ -22,8 +22,8 @@ exports.createSubscription = async (req, res) => {
       quantity: 1,
     },
   ],
-  success_url: "http://localhost:4200/payment-success",
-  cancel_url: "http://localhost:4200/payment-cancel",
+  success_url: "https://ai-content-generator-angular.vercel.app/payment-success",
+  cancel_url: "https://ai-content-generator-angular.vercel.app/payment-cancel",
   metadata: {
     userId,
     plan
